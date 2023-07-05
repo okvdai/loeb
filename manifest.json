@@ -1,0 +1,7 @@
+{
+    "name": "loeb",
+    "description": "Titanfall 2 lobby mod library.",
+    "version_number": "1.0.0",
+    "website_url": "https://github.com/okvdai/loeb",
+    "dependencies": []
+}
