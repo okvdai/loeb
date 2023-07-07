@@ -267,7 +267,10 @@ void function loebCallMods ()
 {
 	foreach (void functionref() func in file.modFunctions)
 	{
-		func()
+		if (func == null){
+			break
+		}
+		thread func()
 	}
 }
 
@@ -340,7 +343,6 @@ void function SetupComboButtonTest( var menu )
 	// Hud_AddEventHandler( file.toggleMenuModeButton, UIE_CLICK, ToggleLobbyMode )
 
 	loebLoadDefault()
-	loebCallMods()
 
 	comboStruct.navUpButtonDisabled = true
 	comboStruct.navDownButton = file.genUpButton
@@ -533,6 +535,7 @@ void function OnLobbyMenu_Open()
 
 	// code will start loading DLC info from first party unless already done
 	InitDLCStore()
+	loebCallMods()
 
 	thread UpdateCachedNewItems()
 	if ( file.putPlayerInMatchmakingAfterDelay )
