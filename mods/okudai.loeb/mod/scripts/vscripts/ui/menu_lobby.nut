@@ -165,16 +165,16 @@ void function Lobby_UpdateInboxButtons()
 		else
 			countString = string( totalCount )
 
-		//SetComboButtonHeaderTitle( menu, file.inboxHeaderIndex, Localize( "#MENU_HEADER_NETWORKS_NEW_MSGS", countString )  )
-		//ComboButton_SetText( file.inboxButton, Localize( "#MENU_TITLE_INBOX_NEW_MSGS", countString ) )
+		SetComboButtonHeaderTitle( menu, 3, Localize( "#MENU_HEADER_NETWORKS_NEW_MSGS", countString )  )
+		ComboButton_SetText( file.buttonIdentifiers[Localize("#MENU_TITLE_INBOX")], Localize( "#MENU_TITLE_INBOX_NEW_MSGS", countString ) )
 	}
 	else
 	{
-		//SetComboButtonHeaderTitle( menu, file.inboxHeaderIndex, Localize( "#MENU_HEADER_NETWORKS" )  )
-		//ComboButton_SetText( file.inboxButton, Localize( "#MENU_TITLE_READ" ) )
+		SetComboButtonHeaderTitle( menu, 3, Localize( "#MENU_HEADER_NETWORKS" )  )
+		ComboButton_SetText( file.buttonIdentifiers[Localize("#MENU_TITLE_INBOX")], Localize( "#MENU_TITLE_READ" ) )
 	}
 
-	//ComboButton_SetNewMail( file.inboxButton, hasNewMail )
+	ComboButton_SetNewMail( file.buttonIdentifiers[Localize("#MENU_TITLE_INBOX")], hasNewMail )
 }
 
 void function InitLobbyMenu()
