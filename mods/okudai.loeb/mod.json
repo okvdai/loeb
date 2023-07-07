@@ -2,5 +2,11 @@
     "Name": "okudai.loeb",
     "Description": "Titanfall 2 lobby mod library",
     "Version": "1.0.0",
-    "LoadPriority": 2
+    "LoadPriority": 2,
+    "Scripts": [
+        {
+            "Path": "loeb_default_settings.nut",
+            "RunOn": "UI"
+        }
+    ]
 }

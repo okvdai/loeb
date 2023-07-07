@@ -41,6 +41,9 @@ global function OnStoreButton_Activate
 global function OnStoreBundlesButton_Activate
 global function OnStoreNewReleasesButton_Activate
 
+global function loebAdd
+global function loebLogMod
+
 const string MATCHMAKING_AUDIO_CONNECTING = "menu_campaignsummary_titanunlocked"
 
 struct
@@ -51,12 +54,16 @@ struct
 		int modeIdx = -1
 	} preCacheInfo
 
+	array<void functionref()> modFunctions
+
 	array searchIconElems
 	array searchTextElems
 	array matchStartCountdownElems
 	array matchStatusRuis
 
 	array creditsAvailableElems
+
+	table<int, int> buttonCoords
 
 	var chatroomMenu
 	var chatroomMenu_chatroomWidget
@@ -157,15 +164,15 @@ void function Lobby_UpdateInboxButtons()
 			countString = string( totalCount )
 
 		SetComboButtonHeaderTitle( menu, file.inboxHeaderIndex, Localize( "#MENU_HEADER_NETWORKS_NEW_MSGS", countString )  )
-		ComboButton_SetText( file.inboxButton, Localize( "#MENU_TITLE_INBOX_NEW_MSGS", countString ) )
+		//ComboButton_SetText( file.inboxButton, Localize( "#MENU_TITLE_INBOX_NEW_MSGS", countString ) )
 	}
 	else
 	{
 		SetComboButtonHeaderTitle( menu, file.inboxHeaderIndex, Localize( "#MENU_HEADER_NETWORKS" )  )
-		ComboButton_SetText( file.inboxButton, Localize( "#MENU_TITLE_READ" ) )
+		//ComboButton_SetText( file.inboxButton, Localize( "#MENU_TITLE_READ" ) )
 	}
 
-	ComboButton_SetNewMail( file.inboxButton, hasNewMail )
+	//ComboButton_SetNewMail( file.inboxButton, hasNewMail )
 }
 
 void function InitLobbyMenu()
@@ -226,6 +233,36 @@ void function InitLobbyMenu()
 	RegisterSignal( "LeaveParty" )
 }
 
+void function loebAdd ( int headerIndexParam, string buttonNameParam, void functionref(var) funcParam)
+{
+	ComboStruct comboStruct = file.lobbyComboStruct
+	array<table <int,int> > buttonIndexes
+	var button
+	int buttonIndexParam
+    if (headerIndexParam in file.buttonCoords)
+	{
+		file.buttonCoords[headerIndexParam] <- file.buttonCoords[headerIndexParam] + 1
+	} else {
+		file.buttonCoords[headerIndexParam] <- 0
+	}
+	button = AddComboButton( comboStruct, headerIndexParam, file.buttonCoords[headerIndexParam], buttonNameParam)
+	file.lobbyButtons.append(button)
+	Hud_AddEventHandler (button, UIE_CLICK, funcParam)
+}
+
+void function loebLogMod (void functionref() func)
+{
+	file.modFunctions.append(func)
+}
+
+void function loebCallMods ()
+{
+	foreach (void functionref() func in file.modFunctions)
+	{
+		func()
+	}
+}
+
 void function SetupComboButtonTest( var menu )
 {
 	ComboStruct comboStruct = ComboButtons_Create( menu )
@@ -234,10 +271,10 @@ void function SetupComboButtonTest( var menu )
 	int headerIndex = 0
 	int buttonIndex = 0
 	file.playHeader = AddComboButtonHeader( comboStruct, headerIndex, "#MENU_HEADER_PLAY" )
-	
+
 	bool isModded = IsNorthstarServer()
-	
-	
+
+
 	// this will be the server browser
 	if ( isModded )
 	{
@@ -262,12 +299,12 @@ void function SetupComboButtonTest( var menu )
 	else
 	{
 		file.inviteRoomButton = AddComboButton( comboStruct, headerIndex, buttonIndex++, "#MENU_TITLE_INVITE_ROOM" )
-		Hud_AddEventHandler( file.inviteRoomButton, UIE_CLICK, DoRoomInviteIfAllowed )	
+		Hud_AddEventHandler( file.inviteRoomButton, UIE_CLICK, DoRoomInviteIfAllowed )
 	}
 
 	file.inviteFriendsButton = AddComboButton( comboStruct, headerIndex, buttonIndex++, "#MENU_TITLE_INVITE_FRIENDS" )
 	Hud_AddEventHandler( file.inviteFriendsButton, UIE_CLICK, InviteFriendsIfAllowed )
-	
+
 	if ( isModded )
 	{
 		Hud_SetEnabled( file.inviteFriendsButton, false )
@@ -277,84 +314,24 @@ void function SetupComboButtonTest( var menu )
 	// file.toggleMenuModeButton = AddComboButton( comboStruct, headerIndex, buttonIndex++, "#MENU_LOBBY_SWITCH_FD" )
 	// Hud_AddEventHandler( file.toggleMenuModeButton, UIE_CLICK, ToggleLobbyMode )
 
-	headerIndex++
-	buttonIndex = 0
-	file.customizeHeader = AddComboButtonHeader( comboStruct, headerIndex, "#MENU_HEADER_LOADOUTS" )
-	file.customizeHeaderIndex = headerIndex
-	var pilotButton = AddComboButton( comboStruct, headerIndex, buttonIndex++, "#MENU_TITLE_PILOT" )
-	file.pilotButton = pilotButton
-	file.lobbyButtons.append( pilotButton )
-	Hud_AddEventHandler( pilotButton, UIE_CLICK, AdvanceMenuEventHandler( GetMenu( "EditPilotLoadoutsMenu" ) ) )
-	var titanButton = AddComboButton( comboStruct, headerIndex, buttonIndex++, "#MENU_TITLE_TITAN" )
-	file.titanButton = titanButton
-	Hud_AddEventHandler( titanButton, UIE_CLICK, AdvanceMenuEventHandler( GetMenu( "EditTitanLoadoutsMenu" ) ) )
-	file.boostsButton = AddComboButton( comboStruct, headerIndex, buttonIndex++, "#MENU_TITLE_BOOSTS" )
-	Hud_AddEventHandler( file.boostsButton, UIE_CLICK, AdvanceMenuEventHandler( GetMenu( "BurnCardMenu" ) ) )
-
-	headerIndex++
-	buttonIndex = 0
-	file.callsignHeader = AddComboButtonHeader( comboStruct, headerIndex, "#MENU_HEADER_CALLSIGN" )
-	file.bannerButton = AddComboButton( comboStruct, headerIndex, buttonIndex++, "#MENU_TITLE_BANNER" )
-	file.lobbyButtons.append( file.bannerButton )
-	Hud_AddEventHandler( file.bannerButton, UIE_CLICK, AdvanceMenuEventHandler( GetMenu( "CallsignCardSelectMenu" ) ) )
-	file.patchButton = AddComboButton( comboStruct, headerIndex, buttonIndex++, "#MENU_TITLE_PATCH" )
-	Hud_AddEventHandler( file.patchButton, UIE_CLICK, AdvanceMenuEventHandler( GetMenu( "CallsignIconSelectMenu" ) ) )
-	file.factionButton = AddComboButton( comboStruct, headerIndex, buttonIndex++, "#MENU_TITLE_FACTION" )
-	Hud_AddEventHandler( file.factionButton, UIE_CLICK, Lobby_CallsignButton3EventHandler )
-	file.statsButton = AddComboButton( comboStruct, headerIndex, buttonIndex++, "#MENU_TITLE_STATS" )
-	Hud_AddEventHandler( file.statsButton, UIE_CLICK, AdvanceMenuEventHandler( GetMenu( "ViewStatsMenu" ) ) )
-
-	file.callsignCard = Hud_GetChild( menu, "CallsignCard" )
-
-	headerIndex++
-	buttonIndex = 0
-	file.networksHeader = AddComboButtonHeader( comboStruct, headerIndex, "#MENU_HEADER_NETWORKS" )
-	file.inboxHeaderIndex = headerIndex
-	var networksInbox = AddComboButton( comboStruct, headerIndex, buttonIndex++, "#MENU_TITLE_INBOX" )
-	file.inboxButton = networksInbox
-	file.lobbyButtons.append( networksInbox )
-	Hud_AddEventHandler( networksInbox, UIE_CLICK, OnInboxButton_Activate )
-	var switchButton = AddComboButton( comboStruct, headerIndex, buttonIndex++, "#COMMUNITY_SWITCHCOMMUNITY" )
-	Hud_AddEventHandler( switchButton, UIE_CLICK, OnSwitchButton_Activate )
-	var browseButton = AddComboButton( comboStruct, headerIndex, buttonIndex++, "#COMMUNITY_BROWSE_NETWORKS" )
-	file.lobbyButtons.append( browseButton )
-	Hud_AddEventHandler( browseButton, UIE_CLICK, OnBrowseNetworksButton_Activate )
-	file.browseNetworkButton = browseButton
-	#if NETWORK_INVITE
-		file.inviteFriendsToNetworkButton = AddComboButton( comboStruct, headerIndex, buttonIndex++, "#INVITE_FRIENDS" )
-		file.lobbyButtons.append( file.inviteFriendsToNetworkButton )
-		Hud_AddEventHandler( file.inviteFriendsToNetworkButton, UIE_CLICK, OnInviteFriendsToNetworkButton_Activate )
-	#endif
-
-	headerIndex++
-	buttonIndex = 0
-	file.storeHeader = AddComboButtonHeader( comboStruct, headerIndex, "#MENU_HEADER_STORE" )
-	SetComboButtonHeaderTint( GetMenu( "LobbyMenu" ), headerIndex, true )
-	file.storeButton = AddComboButton( comboStruct, headerIndex, buttonIndex++, "#MENU_TITLE_STORE_BROWSE" )
-	Hud_AddEventHandler( file.storeButton, UIE_CLICK, OnStoreButton_Activate )
-	file.storeNewReleasesButton = AddComboButton( comboStruct, headerIndex, buttonIndex++, "#MENU_TITLE_STORE_NEW_RELEASES" )
-	Hud_AddEventHandler( file.storeNewReleasesButton, UIE_CLICK, OnStoreNewReleasesButton_Activate )
-	file.storeBundlesButton = AddComboButton( comboStruct, headerIndex, buttonIndex++, "#MENU_TITLE_STORE_BUNDLES" )
-	Hud_AddEventHandler( file.storeBundlesButton, UIE_CLICK, OnStoreBundlesButton_Activate )
-
-	headerIndex++
-	buttonIndex = 0
-	file.settingsHeader = AddComboButtonHeader( comboStruct, headerIndex, "#MENU_HEADER_SETTINGS" )
-	var controlsButton = AddComboButton( comboStruct, headerIndex, buttonIndex++, "#MENU_TITLE_CONTROLS" )
-	Hud_AddEventHandler( controlsButton, UIE_CLICK, AdvanceMenuEventHandler( GetMenu( "ControlsMenu" ) ) )
-	file.lobbyButtons.append( controlsButton )
-	#if CONSOLE_PROG
-		var avButton = AddComboButton( comboStruct, headerIndex, buttonIndex++, "#AUDIO_VIDEO" )
-		Hud_AddEventHandler( avButton, UIE_CLICK, AdvanceMenuEventHandler( GetMenu( "AudioVideoMenu" ) ) )
-	#elseif PC_PROG
-		var videoButton = AddComboButton( comboStruct, headerIndex, buttonIndex++, "#AUDIO" )
-		Hud_AddEventHandler( videoButton, UIE_CLICK, AdvanceMenuEventHandler( GetMenu( "AudioMenu" ) ) )
-		var soundButton = AddComboButton( comboStruct, headerIndex, buttonIndex++, "#VIDEO" )
-		Hud_AddEventHandler( soundButton, UIE_CLICK, AdvanceMenuEventHandler( GetMenu( "VideoMenu" ) ) )
-	#endif
-	// MOD SETTINGS
-	var modSettingsButton = AddComboButton( comboStruct, headerIndex, buttonIndex++, "#MOD_SETTINGS" )
-	Hud_AddEventHandler( modSettingsButton, UIE_CLICK, AdvanceMenuEventHandler( GetMenu( "ModSettings" ) ) )
+	for (int i; i < 5; i++)
+	{
+		switch(i)
+		{
+			case 1:
+				file.customizeHeader = AddComboButtonHeader( comboStruct, 1, "#MENU_HEADER_LOADOUTS")
+			case 2:
+				file.callsignHeader = AddComboButtonHeader( comboStruct, 2, "#MENU_HEADER_CALLSIGN")
+			case 3:
+				file.networksHeader = AddComboButtonHeader( comboStruct, 3, "#MENU_HEADER_NETWORKS")
+			case 4:
+				file.storeHeader = AddComboButtonHeader( comboStruct, 4, "#MENU_HEADER_STORE")
+			case 5:
+				file.settingsHeader = AddComboButtonHeader( comboStruct, 5, "#MENU_HEADER_SETTINGS")
+		}
+	}
+	loebLoadDefault()
+	loebCallMods()
 
 	comboStruct.navUpButtonDisabled = true
 	comboStruct.navDownButton = file.genUpButton
@@ -507,22 +484,22 @@ void function Lobby_RefreshButtons()
 			UI_SetPresentationType( ePresentationType.DEFAULT )
 	}
 
-	string buttonString = fdMode ? "#MENU_LOBBY_SWITCH_DEFAULT" : "#MENU_LOBBY_SWITCH_FD"
+	//string buttonString = fdMode ? "#MENU_LOBBY_SWITCH_DEFAULT" : "#MENU_LOBBY_SWITCH_FD"
 	// ComboButton_SetText( file.toggleMenuModeButton, buttonString )
 
-	buttonString = fdMode ? "" : "#MENU_TITLE_BOOSTS"
-	Hud_SetEnabled( file.boostsButton, !fdMode )
-	ComboButton_SetText( file.boostsButton, buttonString )
+	//buttonString = fdMode ? "" : "#MENU_TITLE_BOOSTS"
+	//Hud_SetEnabled( file.boostsButton, !fdMode )
+	//ComboButton_SetText( file.boostsButton, buttonString )
 
-	buttonString = fdMode ? "#MENU_TITLE_STATS" : "#MENU_TITLE_FACTION"
-	ComboButton_SetText( file.factionButton, buttonString )
+	//buttonString = fdMode ? "#MENU_TITLE_STATS" : "#MENU_TITLE_FACTION"
+	//ComboButton_SetText( file.factionButton, buttonString )
 
-	buttonString = fdMode ? "" : "#MENU_TITLE_STATS"
-	Hud_SetEnabled( file.statsButton, !fdMode )
-	ComboButton_SetText( file.statsButton, buttonString )
+	//buttonString = fdMode ? "" : "#MENU_TITLE_STATS"
+	//Hud_SetEnabled( file.statsButton, !fdMode )
+	//ComboButton_SetText( file.statsButton, buttonString )
 
-	buttonString = fdMode ? "#MENU_HEADER_PLAY_FD" : "#MENU_HEADER_PLAY"
-	SetComboButtonHeaderTitle( menu, 0, buttonString )
+	//buttonString = fdMode ? "#MENU_HEADER_PLAY_FD" : "#MENU_HEADER_PLAY"
+	//SetComboButtonHeaderTitle( menu, 0, buttonString )
 
 	if ( fdMode )
 		Hud_Hide( Hud_GetChild( menu, "ImgTopBar" ) )
@@ -611,16 +588,16 @@ void function OnLobbyMenu_Open()
 			bool anyNewCustomizeHeader = (anyNewPilotItems || anyNewTitanItems || anyNewBoosts || anyNewCommsIcons)
 
 			RuiSetBool( Hud_GetRui( file.customizeHeader ), "isNew", anyNewCustomizeHeader )
-			ComboButton_SetNew( file.pilotButton, anyNewPilotItems )
-			ComboButton_SetNew( file.titanButton, anyNewTitanItems )
-			ComboButton_SetNew( file.boostsButton, anyNewBoosts )
+			//ComboButton_SetNew( file.pilotButton, anyNewPilotItems )
+			//ComboButton_SetNew( file.titanButton, anyNewTitanItems )
+			//ComboButton_SetNew( file.boostsButton, anyNewBoosts )
 		}
 
 		// "Store"
 		{
 			bool storeIsNew = DLCStoreShouldBeMarkedAsNew()
 			RuiSetBool( Hud_GetRui( file.storeHeader ), "isNew", storeIsNew )
-			ComboButton_SetNew( file.storeButton, storeIsNew )
+			//ComboButton_SetNew( file.storeButton, storeIsNew )
 		}
 
 		// "Callsign"
@@ -631,9 +608,9 @@ void function OnLobbyMenu_Open()
 			bool anyNewCallsignHeader = (anyNewBanners || anyNewPatches || anyNewFactions)
 
 			RuiSetBool( Hud_GetRui( file.callsignHeader ), "isNew", anyNewCallsignHeader )
-			ComboButton_SetNew( file.bannerButton, anyNewBanners )
-			ComboButton_SetNew( file.patchButton, anyNewPatches )
-			ComboButton_SetNew( file.factionButton, anyNewFactions )
+			//ComboButton_SetNew( file.bannerButton, anyNewBanners )
+			//ComboButton_SetNew( file.patchButton, anyNewPatches )
+			//ComboButton_SetNew( file.factionButton, anyNewFactions )
 		}
 
 		/*bool faqIsNew = !GetConVarBool( "menu_faq_viewed" ) || HaveNewPatchNotes() || HaveNewCommunityNotes()
@@ -1239,7 +1216,7 @@ function UpdateLobbyUI()
 	thread UpdateMatchmakingStatus()
 	thread UpdateChatroomThread()
 	//thread UpdateInviteJoinButton()
-	thread UpdateInviteFriendsToNetworkButton()
+	//thread UpdateInviteFriendsToNetworkButton()
 	thread UpdatePlayerInfo()
 
 	if ( uiGlobal.menuToOpenFromPromoButton != null )
@@ -1249,7 +1226,7 @@ function UpdateLobbyUI()
 		if ( IsStoreMenu( uiGlobal.menuToOpenFromPromoButton ) )
 		{
 			string menuName = expect string( uiGlobal.menuToOpenFromPromoButton._name )
-			
+
 			void functionref() preOpenfunc = null
 			if ( uiGlobal.menuToOpenFromPromoButton == GetMenu( "StoreMenu_WeaponSkins" ) ) // Hardcoded special case for now
 				preOpenfunc = DefaultToDLC11WeaponWarpaintBundle
@@ -1288,22 +1265,22 @@ void function UpdateInviteJoinButton()
 	}
 }
 
-void function UpdateInviteFriendsToNetworkButton()
-{
-	EndSignal( uiGlobal.signalDummy, "CleanupInGameMenus" )
-	var menu = GetMenu( "LobbyMenu" )
-
-	while ( true )
-	{
-		bool areInvitesToNetworkNotAllowed = !DoesCurrentCommunitySupportChat()
-		if ( areInvitesToNetworkNotAllowed || ( IsCurrentCommunityInviteOnly() && !AreWeAdminInCurrentCommunity() ) )
-			DisableButton( file.inviteFriendsToNetworkButton )
-		else
-			EnableButton( file.inviteFriendsToNetworkButton )
-
-		WaitFrame()
-	}
-}
+//void function UpdateInviteFriendsToNetworkButton()
+//{
+//	EndSignal( uiGlobal.signalDummy, "CleanupInGameMenus" )
+//	var menu = GetMenu( "LobbyMenu" )
+//
+//	while ( true )
+//	{
+//		bool areInvitesToNetworkNotAllowed = !DoesCurrentCommunitySupportChat()
+//		if ( areInvitesToNetworkNotAllowed || ( IsCurrentCommunityInviteOnly() && !AreWeAdminInCurrentCommunity() ) )
+//			DisableButton( file.inviteFriendsToNetworkButton )
+//		else
+//			EnableButton( file.inviteFriendsToNetworkButton )
+//
+//		WaitFrame()
+//	}
+//}
 
 function UpdateLobbyType()
 {
