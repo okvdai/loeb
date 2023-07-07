@@ -43,6 +43,7 @@ global function OnStoreNewReleasesButton_Activate
 
 global function loebAdd
 global function loebLogMod
+global function loebSetLockedButton
 
 const string MATCHMAKING_AUDIO_CONNECTING = "menu_campaignsummary_titanunlocked"
 
@@ -64,6 +65,7 @@ struct
 	array creditsAvailableElems
 
 	table<int, int> buttonCoords
+	table<string, var> buttonIdentifiers
 
 	var chatroomMenu
 	var chatroomMenu_chatroomWidget
@@ -247,7 +249,13 @@ void function loebAdd ( int headerIndexParam, string buttonNameParam, void funct
 	}
 	button = AddComboButton( comboStruct, headerIndexParam, file.buttonCoords[headerIndexParam], buttonNameParam)
 	file.lobbyButtons.append(button)
+	file.buttonIdentifiers[buttonNameParam] <- button
 	Hud_AddEventHandler (button, UIE_CLICK, funcParam)
+}
+
+void function loebSetLockedButton (string identifier, bool enabled)
+{
+	Hud_SetLocked(file.buttonIdentifiers[identifier], enabled)
 }
 
 void function loebLogMod (void functionref() func)
