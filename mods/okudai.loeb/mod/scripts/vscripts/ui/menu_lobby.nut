@@ -163,12 +163,12 @@ void function Lobby_UpdateInboxButtons()
 		else
 			countString = string( totalCount )
 
-		SetComboButtonHeaderTitle( menu, file.inboxHeaderIndex, Localize( "#MENU_HEADER_NETWORKS_NEW_MSGS", countString )  )
+		//SetComboButtonHeaderTitle( menu, file.inboxHeaderIndex, Localize( "#MENU_HEADER_NETWORKS_NEW_MSGS", countString )  )
 		//ComboButton_SetText( file.inboxButton, Localize( "#MENU_TITLE_INBOX_NEW_MSGS", countString ) )
 	}
 	else
 	{
-		SetComboButtonHeaderTitle( menu, file.inboxHeaderIndex, Localize( "#MENU_HEADER_NETWORKS" )  )
+		//SetComboButtonHeaderTitle( menu, file.inboxHeaderIndex, Localize( "#MENU_HEADER_NETWORKS" )  )
 		//ComboButton_SetText( file.inboxButton, Localize( "#MENU_TITLE_READ" ) )
 	}
 
@@ -270,7 +270,24 @@ void function SetupComboButtonTest( var menu )
 
 	int headerIndex = 0
 	int buttonIndex = 0
-	file.playHeader = AddComboButtonHeader( comboStruct, headerIndex, "#MENU_HEADER_PLAY" )
+	for (int i = -1; i < 5; i++)
+	{
+		switch(i)
+		{
+			case 0:
+				file.playHeader = AddComboButtonHeader( comboStruct, 0, "#MENU_HEADER_PLAY")
+			case 1:
+				file.customizeHeader = AddComboButtonHeader( comboStruct, 1, "#MENU_HEADER_LOADOUTS")
+			case 2:
+				file.callsignHeader = AddComboButtonHeader( comboStruct, 2, "#MENU_HEADER_CALLSIGN")
+			case 3:
+				file.networksHeader = AddComboButtonHeader( comboStruct, 3, "#MENU_HEADER_NETWORKS")
+			case 4:
+				file.storeHeader = AddComboButtonHeader( comboStruct, 4, "#MENU_HEADER_STORE")
+			case 5:
+				file.settingsHeader = AddComboButtonHeader( comboStruct, 5, "#MENU_HEADER_SETTINGS")
+		}
+	}
 
 	bool isModded = IsNorthstarServer()
 
@@ -314,22 +331,6 @@ void function SetupComboButtonTest( var menu )
 	// file.toggleMenuModeButton = AddComboButton( comboStruct, headerIndex, buttonIndex++, "#MENU_LOBBY_SWITCH_FD" )
 	// Hud_AddEventHandler( file.toggleMenuModeButton, UIE_CLICK, ToggleLobbyMode )
 
-	for (int i; i < 5; i++)
-	{
-		switch(i)
-		{
-			case 1:
-				file.customizeHeader = AddComboButtonHeader( comboStruct, 1, "#MENU_HEADER_LOADOUTS")
-			case 2:
-				file.callsignHeader = AddComboButtonHeader( comboStruct, 2, "#MENU_HEADER_CALLSIGN")
-			case 3:
-				file.networksHeader = AddComboButtonHeader( comboStruct, 3, "#MENU_HEADER_NETWORKS")
-			case 4:
-				file.storeHeader = AddComboButtonHeader( comboStruct, 4, "#MENU_HEADER_STORE")
-			case 5:
-				file.settingsHeader = AddComboButtonHeader( comboStruct, 5, "#MENU_HEADER_SETTINGS")
-		}
-	}
 	loebLoadDefault()
 	loebCallMods()
 
