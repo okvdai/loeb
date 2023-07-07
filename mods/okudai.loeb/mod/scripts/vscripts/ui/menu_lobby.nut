@@ -597,16 +597,16 @@ void function OnLobbyMenu_Open()
 			bool anyNewCustomizeHeader = (anyNewPilotItems || anyNewTitanItems || anyNewBoosts || anyNewCommsIcons)
 
 			RuiSetBool( Hud_GetRui( file.customizeHeader ), "isNew", anyNewCustomizeHeader )
-			//ComboButton_SetNew( file.pilotButton, anyNewPilotItems )
-			//ComboButton_SetNew( file.titanButton, anyNewTitanItems )
-			//ComboButton_SetNew( file.boostsButton, anyNewBoosts )
+			ComboButton_SetNew( file.buttonIdentifiers[Localize("#MENU_TITLE_PILOT")], anyNewPilotItems )
+			ComboButton_SetNew( file.buttonIdentifiers[Localize("#MENU_TITLE_TITAN")], anyNewTitanItems )
+			ComboButton_SetNew( file.buttonIdentifiers[Localize("#MENU_TITLE_BOOSTS")], anyNewBoosts )
 		}
 
 		// "Store"
 		{
 			bool storeIsNew = DLCStoreShouldBeMarkedAsNew()
 			RuiSetBool( Hud_GetRui( file.storeHeader ), "isNew", storeIsNew )
-			//ComboButton_SetNew( file.storeButton, storeIsNew )
+			ComboButton_SetNew( file.buttonIdentifiers[Localize("#MENU_TITLE_STORE_BROWSE")], storeIsNew )
 		}
 
 		// "Callsign"
@@ -617,9 +617,9 @@ void function OnLobbyMenu_Open()
 			bool anyNewCallsignHeader = (anyNewBanners || anyNewPatches || anyNewFactions)
 
 			RuiSetBool( Hud_GetRui( file.callsignHeader ), "isNew", anyNewCallsignHeader )
-			//ComboButton_SetNew( file.bannerButton, anyNewBanners )
-			//ComboButton_SetNew( file.patchButton, anyNewPatches )
-			//ComboButton_SetNew( file.factionButton, anyNewFactions )
+			ComboButton_SetNew( file.buttonIdentifiers[Localize("#MENU_TITLE_BANNER")], anyNewBanners )
+			ComboButton_SetNew( file.buttonIdentifiers[Localize("#MENU_TITLE_PATCH")], anyNewPatches )
+			ComboButton_SetNew( file.buttonIdentifiers[Localize("#MENU_TITLE_FACTION")], anyNewFactions )
 		}
 
 		/*bool faqIsNew = !GetConVarBool( "menu_faq_viewed" ) || HaveNewPatchNotes() || HaveNewCommunityNotes()
