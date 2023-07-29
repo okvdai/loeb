@@ -2,8 +2,9 @@ global function loebLoadDefault
 
 void function loebLoadDefault()
 {
-    //We're skipping the PLAY section (headerIndex 0) since I don't think it should be tampered with. This can be easily added in later.
-
+    //PLAY (headerIndex 0)
+    loebAdd(0, Localize("#MENU_TITLE_SERVER_BROWSER"), OpenServerBrowser)
+    loebAdd(0, Localize("#PRIVATE_MATCH"), StartPrivateMatch)
     //CUSTOMIZE (headerIndex 1)
     loebAdd(1, Localize("#MENU_TITLE_PILOT"), AdvanceMenuEventHandler(GetMenu("EditPilotLoadoutsMenu")))    //Pilot
     loebAdd(1, Localize("#MENU_TITLE_TITAN"), AdvanceMenuEventHandler(GetMenu("EditTitanLoadoutsMenu")))    //Titan
@@ -28,4 +29,22 @@ void function loebLoadDefault()
     loebAdd(5, Localize("#AUDIO"), AdvanceMenuEventHandler(GetMenu("AudioMenu")))                           //Audio
     loebAdd(5, Localize("#VIDEO"), AdvanceMenuEventHandler(GetMenu("VideoMenu")))                           //Video
     loebAdd(5, Localize("#MOD_SETTINGS"), AdvanceMenuEventHandler(GetMenu("ModSettings")))                  //Mod Settings
+}
+
+// These functions are ported over from the Northstar menu_lobby.nut
+
+void function StartPrivateMatch( var button )
+{
+	if ( Hud_IsLocked( button ) )
+		return
+
+	ClientCommand( "StartPrivateMatchSearch" )
+}
+
+void function OpenServerBrowser( var button )
+{
+	if ( Hud_IsLocked( button ) )
+		return
+
+	AdvanceMenu( GetMenu( "ServerBrowserMenu" ) )
 }
