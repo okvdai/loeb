@@ -343,11 +343,12 @@ void function SetupComboButtonTest( var menu )
 	// Hud_AddEventHandler( file.toggleMenuModeButton, UIE_CLICK, ToggleLobbyMode )
 
 	loebLoadDefault()
+	loebCallMods()
 
 	comboStruct.navUpButtonDisabled = true
 	comboStruct.navDownButton = file.genUpButton
 
-	ComboButtons_Finalize( comboStruct )
+
 }
 
 bool function MatchResultsExist()
@@ -533,9 +534,10 @@ void function OnLobbyMenu_Open()
 {
 	Assert( IsConnected() )
 
+	ComboButtons_Finalize( file.lobbyComboStruct )
+
 	// code will start loading DLC info from first party unless already done
 	InitDLCStore()
-	loebCallMods()
 
 	thread UpdateCachedNewItems()
 	if ( file.putPlayerInMatchmakingAfterDelay )
