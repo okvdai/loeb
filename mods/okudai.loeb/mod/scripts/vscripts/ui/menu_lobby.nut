@@ -19,6 +19,8 @@ global function RefreshCreditsAvailable
 
 global function InviteFriendsIfAllowed
 global function SetPutPlayerInMatchmakingAfterDelay
+global function StartNSPrivateMatch
+global function OpenNSServerBrowser
 
 global function DLCStoreShouldBeMarkedAsNew
 
@@ -419,6 +421,22 @@ void function InviteFriendsIfAllowed( var button )
 	#endif
 
 	thread CreatePartyAndInviteFriends()
+}
+
+void function StartNSPrivateMatch( var button )
+{
+	if ( Hud_IsLocked( button ) )
+		return
+
+	ClientCommand( "StartPrivateMatchSearch" )
+}
+
+void function OpenNSServerBrowser( var button )
+{
+	if ( Hud_IsLocked( button ) )
+		return
+
+	AdvanceMenu( GetMenu( "ServerBrowserMenu" ) )
 }
 
 bool function CanInvite()
