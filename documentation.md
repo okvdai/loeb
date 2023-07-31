@@ -43,9 +43,14 @@ This function lets you add a button to the lobby menu.
 `void functionref (var) funcParam` is the function executed on button press. Usually this is something along the lines of `AdvanceMenuEventHandler(GetMenu("example"))`.
 
 
-- `void function loebSetLocked( string identifier, bool enabled )`
+- `void function loebSetLockedButton ( string identifier, bool enabled )`
 
 This function lets you set whether or not a button is locked.
 `string identifier` is the same as the `string buttonNameParam` described above.
 
 `bool enabled` is self explanatory: `true` is locked, `false` is unlocked.
+
+
+- `void function loebSetNewButton (string identifier, bool enabled )`
+
+This function does the same thing as the previous one, only marking buttons as new instead of locked.
