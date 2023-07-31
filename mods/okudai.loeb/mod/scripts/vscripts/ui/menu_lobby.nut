@@ -45,6 +45,7 @@ global function OnStoreNewReleasesButton_Activate
 
 global function loebAdd
 global function loebSetLockedButton
+global function loebSetNewButton
 
 const string MATCHMAKING_AUDIO_CONNECTING = "menu_campaignsummary_titanunlocked"
 
@@ -159,6 +160,11 @@ void function loebAdd ( int headerIndexParam, string buttonNameParam, void funct
 void function loebSetLockedButton (string identifier, bool enabled)
 {
 	Hud_SetLocked(file.buttonIdentifiers[identifier], enabled)
+}
+
+void function loebSetNewButton (string identifier, bool enabled)
+{
+	Hud_SetNew(file.buttonIdentifiers[identifier], enabled)
 }
 
 //////////////////////
