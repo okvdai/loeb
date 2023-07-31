@@ -44,7 +44,6 @@ global function OnStoreBundlesButton_Activate
 global function OnStoreNewReleasesButton_Activate
 
 global function loebAdd
-global function loebLogMod
 global function loebSetLockedButton
 
 const string MATCHMAKING_AUDIO_CONNECTING = "menu_campaignsummary_titanunlocked"
@@ -56,8 +55,6 @@ struct
 		int mapIdx = -1
 		int modeIdx = -1
 	} preCacheInfo
-
-	array<void functionref()> modFunctions
 
 	array searchIconElems
 	array searchTextElems
@@ -162,22 +159,6 @@ void function loebAdd ( int headerIndexParam, string buttonNameParam, void funct
 void function loebSetLockedButton (string identifier, bool enabled)
 {
 	Hud_SetLocked(file.buttonIdentifiers[identifier], enabled)
-}
-
-void function loebLogMod (void functionref() func)
-{
-	file.modFunctions.append(func)
-}
-
-void function loebCallMods ()
-{
-	foreach (void functionref() func in file.modFunctions)
-	{
-		if (func == null){
-			break
-		}
-		thread func()
-	}
 }
 
 //////////////////////
@@ -310,7 +291,6 @@ void function SetupComboButtonTest( var menu )
 	bool isModded = IsNorthstarServer()
 
 	loebLoadDefault()
-	loebCallMods()
 
 	comboStruct.navUpButtonDisabled = true
 	comboStruct.navDownButton = file.genUpButton
