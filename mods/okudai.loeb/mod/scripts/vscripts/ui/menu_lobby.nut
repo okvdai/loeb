@@ -137,6 +137,50 @@ void function MenuLobby_Init()
 	AddUICallback_OnLevelInit( OnLobbyLevelInit )
 }
 
+//////////////////////
+/// LOEB FUNCTIONS ///
+//////////////////////
+
+void function loebAdd ( int headerIndexParam, string buttonNameParam, void functionref(var) funcParam)
+{
+	ComboStruct comboStruct = file.lobbyComboStruct
+	array<table <int,int> > buttonIndexes
+	var button
+	int buttonIndexParam
+    if (headerIndexParam in file.buttonCoords)
+	{
+		file.buttonCoords[headerIndexParam] <- file.buttonCoords[headerIndexParam] + 1
+	} else {
+		file.buttonCoords[headerIndexParam] <- 0
+	}
+	button = AddComboButton( comboStruct, headerIndexParam, file.buttonCoords[headerIndexParam], buttonNameParam)
+	file.lobbyButtons.append(button)
+	file.buttonIdentifiers[buttonNameParam] <- button
+	Hud_AddEventHandler (button, UIE_CLICK, funcParam)
+}
+
+void function loebSetLockedButton (string identifier, bool enabled)
+{
+	Hud_SetLocked(file.buttonIdentifiers[identifier], enabled)
+}
+
+void function loebLogMod (void functionref() func)
+{
+	file.modFunctions.append(func)
+}
+
+void function loebCallMods ()
+{
+	foreach (void functionref() func in file.modFunctions)
+	{
+		if (func == null){
+			break
+		}
+		thread func()
+	}
+}
+
+//////////////////////
 
 bool function ChatroomIsVisibleAndFocused()
 {
@@ -235,45 +279,6 @@ void function InitLobbyMenu()
 	RegisterSignal( "PutPlayerInMatchmakingAfterDelay" )
 	RegisterSignal( "CancelRestartingMatchmaking" )
 	RegisterSignal( "LeaveParty" )
-}
-
-void function loebAdd ( int headerIndexParam, string buttonNameParam, void functionref(var) funcParam)
-{
-	ComboStruct comboStruct = file.lobbyComboStruct
-	array<table <int,int> > buttonIndexes
-	var button
-	int buttonIndexParam
-    if (headerIndexParam in file.buttonCoords)
-	{
-		file.buttonCoords[headerIndexParam] <- file.buttonCoords[headerIndexParam] + 1
-	} else {
-		file.buttonCoords[headerIndexParam] <- 0
-	}
-	button = AddComboButton( comboStruct, headerIndexParam, file.buttonCoords[headerIndexParam], buttonNameParam)
-	file.lobbyButtons.append(button)
-	file.buttonIdentifiers[buttonNameParam] <- button
-	Hud_AddEventHandler (button, UIE_CLICK, funcParam)
-}
-
-void function loebSetLockedButton (string identifier, bool enabled)
-{
-	Hud_SetLocked(file.buttonIdentifiers[identifier], enabled)
-}
-
-void function loebLogMod (void functionref() func)
-{
-	file.modFunctions.append(func)
-}
-
-void function loebCallMods ()
-{
-	foreach (void functionref() func in file.modFunctions)
-	{
-		if (func == null){
-			break
-		}
-		thread func()
-	}
 }
 
 void function SetupComboButtonTest( var menu )
