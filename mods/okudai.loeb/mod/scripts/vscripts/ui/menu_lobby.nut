@@ -347,7 +347,7 @@ void function SetupComboButtonTest( var menu )
 		}
 	}
 
-	bool isModded = IsNorthstarServer()
+	
 
 	loebLoadDefault()
 
